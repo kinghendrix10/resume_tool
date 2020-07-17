@@ -20,15 +20,12 @@ from spacy.matcher import Matcher
 # In[648]:
 
 
-# # mypath = 'C:/Users/Huleji/Documents/CV and Resume/Sample/' #enter your path here where you saved the resumes
-# mypath = input('Enter folder path: ')
-# assert os.path.exists(mypath), 'Files not found at '+str(mypath)
+mypath = input('Enter folder path: ')
+assert os.path.exists(mypath), 'Files not found at '+str(mypath)
 # # mypath = open(user_input, 'r+')
-# onlyfiles = [os.path.join(mypath, f) for f in os.listdir(mypath) if os.path.isfile(os.path.join(mypath, f))]
-# resume_tool(onlyfiles)[0]
+onlyfiles = [os.path.join(mypath, f) for f in os.listdir(mypath) if os.path.isfile(os.path.join(mypath, f))]
+resume_tool(onlyfiles)[0]
 
-
-# In[637]:
 
 
 def extract_func(file):
@@ -44,8 +41,6 @@ def extract_func(file):
     return resume
 
 
-# In[638]:
-
 
 def candidate_table(file, cand_df=pd.DataFrame(), cand_profile=pd.DataFrame(), nlp = en_core_web_sm.load()):
     
@@ -56,7 +51,7 @@ def candidate_table(file, cand_df=pd.DataFrame(), cand_profile=pd.DataFrame(), n
     
     matcher = Matcher(nlp.vocab)
     nlp_text = nlp(res_text)
-    # First name and Last name are always Proper Nouns
+    # Parse Resume Text for First name and Last name 
     pattern = [{'POS': 'PROPN'}, {'POS': 'PROPN'}]
     
     matcher.add('FULL NAME', None, pattern)
@@ -68,11 +63,9 @@ def candidate_table(file, cand_df=pd.DataFrame(), cand_profile=pd.DataFrame(), n
     full_name
     
     cand_full_name = pd.read_csv(StringIO(full_name.text), names = ['Candidate Name'])
-#     for match_id, start, end in matches:
-#         full_name = nlp_text[start:end]
-#         print (full_name.text)
 
-    # reg = re.compile(r'.*?(\(?\d{6}\D{0,3}\d{3}\D{0,3}\d{4}\D{0,3}).*?', re.S)
+    #Code to parse for phone numbers
+    # reg = re.compile(r'.*?(\(?\d{6}\D{0,3}\d{3}\D{0,3}\d{4}\D{0,3}).*?', re.S) #code to extract Nigerian Numbers
     reg = re.compile(r'.*?(\(?\d{3}\D{0,3}\d{3}\D{0,3}\d{4}\D{0,3}).*?', re.S)
 
     phone = re.findall(reg, res_text)
@@ -81,14 +74,18 @@ def candidate_table(file, cand_df=pd.DataFrame(), cand_profile=pd.DataFrame(), n
         if phone[i]:
             number = ''.join(phone[i])
             number = re.sub(r'[a-z]|[\s\-\.\+]','', number)
-            if len(number) > 11:
-                number = '+' + number
-            else:
-                number = '+234' + number
+            
+#             #code to standardize Nigerian Numbers
+#             if len(number) > 11:
+#                 number = '+' + number
+#             else:
+#                 number = '+234' + number
             numbers.append(number)
-#     return numbers
+
+    #code to parse for emails
     email = re.findall(r'[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+', res_text)
     
+    #code to parse for academic degress
     education = []
     dip_deg = re.findall(r'(o|ordinary)?[-\s\.]?(a|advanced)?[-\s\.]+(n|national)?[-\s\.]?(diploma|dip|d)[-\s\.]+', res_text)
     # dip_deg = re.findall(r'(\w)[-\s\.]?(d|diploma)[-\s\.]?', res_text)
@@ -96,8 +93,8 @@ def candidate_table(file, cand_df=pd.DataFrame(), cand_profile=pd.DataFrame(), n
         if dip_deg[i]:
             dip_deg = ' '.join(dip_deg[i])
         
-# bachelor_deg = re.findall(r'(b|bachelor)[-\s\.]+(a|arts|sc|science|ed|edu|education|eng|engineering|tech|technology)[-\s\.]+', res_text) 
-# bachelor_deg = re.findall(r'(b|bachelor)[-\s\.]+(of)*[-\s\.]+(a|arts|sc|science|ed|edu|education|eng|engineering|tech|technology)[-\s\.]+', res_text) 
+    # bachelor_deg = re.findall(r'(b|bachelor)[-\s\.]+(a|arts|sc|science|ed|edu|education|eng|engineering|tech|technology)[-\s\.]+', res_text) 
+    # bachelor_deg = re.findall(r'(b|bachelor)[-\s\.]+(of)*[-\s\.]+(a|arts|sc|science|ed|edu|education|eng|engineering|tech|technology)[-\s\.]+', res_text) 
     bachelor_deg = re.findall(r'(b|bachelor)[-\s\.]?(of)*[-\s\.]?(a|arts|sc|science|ed|edu|education|eng|engineering|tech|technology)[-\s\.\,]+', res_text) 
     for i in range (0, len(bachelor_deg)):
         if bachelor_deg[i]:
@@ -128,8 +125,6 @@ def candidate_table(file, cand_df=pd.DataFrame(), cand_profile=pd.DataFrame(), n
         education.append(masters_deg)
     if len(phd_deg) != 0:
         education.append(phd_deg)
-
-#     return education
     
     text = res_text
     #below is the csv where we have all the keywords, you can customize your own
@@ -153,7 +148,7 @@ def candidate_table(file, cand_df=pd.DataFrame(), cand_profile=pd.DataFrame(), n
     
         matches = matcher(doc)
         for match_id, start, end in matches:
-            rule_id = nlp.vocab.strings[match_id]  # get the unicode ID, i.e. 'COLOR'
+            rule_id = nlp.vocab.strings[match_id]  # get the unicode ID
             span = doc[start : end]  # get the matched slice of the doc
             d.append((rule_id, span.text))
             x.append(span.text)
@@ -166,12 +161,13 @@ def candidate_table(file, cand_df=pd.DataFrame(), cand_profile=pd.DataFrame(), n
     df3 = pd.concat([df1['Subject'],df2['Keyword'], df2['Count']], axis =1) 
     df3['Count'] = df3['Count'].apply(lambda x: x.rstrip(")"))
 
+     # code to obtain CV file name
     base = os.path.basename(file)
     filename = os.path.splitext(base)[0]
        
     name = filename.split('_')
     name = name[0].lower()
-    # converting str to dataframe
+   
     doc_name = pd.read_csv(StringIO(name), names = ['File Name'])
 
 
@@ -220,9 +216,6 @@ def cand_graph(dataframe):
     return plt
 
 
-# In[644]:
-
-
 def resume_tool(onlyfiles, database = pd.DataFrame(),     database1 = pd.DataFrame()):  
     i = 0 
     while i < len(onlyfiles):
@@ -231,196 +224,3 @@ def resume_tool(onlyfiles, database = pd.DataFrame(),     database1 = pd.DataFra
         database, database1 = database.append(dat), database1.append(dat1)
         i +=1
     return database, cand_graph(database1)
-
-
-# In[640]:
-
-
-# database
-
-
-# In[641]:
-
-
-# database1
-
-
-# In[642]:
-
-
-# cand_graph(database1)
-
-
-# In[546]:
-
-
-# keyword_dict = pd.read_csv('skills.csv', encoding='ISO-8859-1')
-
-# Stats_words = [nlp(text) for text in keyword_dict['Statistics'].dropna(axis = 0)]
-# NLP_words = [nlp(text) for text in keyword_dict['NLP'].dropna(axis = 0)]
-# ML_words = [nlp(text) for text in keyword_dict['Machine Learning'].dropna(axis = 0)]
-# DL_words = [nlp(text) for text in keyword_dict['Deep Learning'].dropna(axis = 0)]
-# R_words = [nlp(text) for text in keyword_dict['R Language'].dropna(axis = 0)]
-# Python_words = [nlp(text) for text in keyword_dict['Python Language'].dropna(axis = 0)]
-# Data_Engineering_words = [nlp(text) for text in keyword_dict['Data Engineering'].dropna(axis = 0)]
-
-
-# In[558]:
-
-
-# keyword_dict.columns[0]
-
-
-# In[559]:
-
-
-# Stats_words
-
-
-# In[571]:
-
-
-# df
-
-
-# In[548]:
-
-
-# keyword_dict
-
-
-# In[549]:
-
-
-# from spacy.matcher import PhraseMatcher
-# from collections import Counter
-
-
-# nlp = en_core_web_sm.load()
-
-# matcher = PhraseMatcher(nlp.vocab)
-# matcher.add('Stats', None, *Stats_words)
-# matcher.add('NLP', None, *NLP_words)
-# matcher.add('ML', None, *ML_words)
-# matcher.add('DL', None, *DL_words)
-# matcher.add('R', None, *R_words)
-# matcher.add('Python', None, *Python_words)
-# matcher.add('DE', None, *Data_Engineering_words)
-# doc = nlp(text)
-    
-# d = []
-# x = []
-# matches = matcher(doc)
-# for match_id, start, end in matches:
-#     rule_id = nlp.vocab.strings[match_id]  # get the unicode ID, i.e. 'COLOR'
-#     span = doc[start : end]  # get the matched slice of the doc
-#     d.append((rule_id, span.text))
-#     x.append(span.text)
-# keywords = "\n".join(f'{i[0]} {i[1]} ({j})' for i,j in Counter(d).items())
-    
-# ## convertimg string of keywords to dataframe
-# df = pd.read_csv(StringIO(keywords),names = ['Keywords_List'])
-# df1 = pd.DataFrame(df.Keywords_List.str.split(' ',1).tolist(),columns = ['Subject','Keyword'])
-# df2 = pd.DataFrame(df1.Keyword.str.split('(',1).tolist(),columns = ['Keyword', 'Count'])
-# df3 = pd.concat([df1['Subject'],df2['Keyword'], df2['Count']], axis =1) 
-# df3['Count'] = df3['Count'].apply(lambda x: x.rstrip(")"))
-    
-# #     base = os.path.basename(file)
-# #     filename = os.path.splitext(base)[0]
-       
-# #     name = filename.split('_')
-# #     name2 = name[0]
-# #     name2 = name2.lower()
-# #     ## converting str to dataframe
-# #     name3 = pd.read_csv(StringIO(name2),names = ['Candidate Name'])
-
-# # dataframe = pd.DataFrame()
-# # dataframe['Candidate Name'] = cand_name
-# # dataframe = pd.concat([dataframe, df3['Subject'], df3['Keyword'], df3['Count']], axis = 1)
-# # dataframe['Candidate Name'] = dataframe['Candidate Name'].fillna(cand_name, inplace = True)
-
-# #     return(dataf)
-
-
-# In[550]:
-
-
-# import pandas as pd
-# from io import StringIO
-
-# base = os.path.basename(file)
-# filename = os.path.splitext(base)[0]
-       
-# name = filename.split('_')
-# name = name[0].lower()
-# # converting str to dataframe
-# doc_name = pd.read_csv(StringIO(name), names = ['Candidate Name'])
-
-
-# # match_id, start, end = matches[0]
-# span = nlp_text[start:end]
-# print (end_name)
-# cand_name
-
-# dataframe = pd.DataFrame()
-# dataframe['Candidate Name'] = str(cand_name)
-# dataframe = pd.concat([doc_name['Candidate Name'], df3['Subject'], df3['Keyword'], df3['Count']], axis = 1)
-# dataframe['Candidate Name'] = dataframe['Candidate Name'].fillna(doc_name['Candidate Name'].iloc[0])
-
-# dataframe
-
-
-# In[551]:
-
-
-# profile = pd.DataFrame()
-# profile['Name'] = str(name).strip('[]'),
-# profile['Contact'] = ','.join(numbers),
-# profile['Email'] = ''.join(email),
-# profile['Education'] = ','.join(education),
-# profile['Skills'] = ','.join(x)
-
-
-# In[552]:
-
-
-# profile
-
-
-# In[172]:
-
-
-# final_df = dataframe['Keyword'].groupby([dataframe['Candidate Name'], dataframe['Subject']]).count().unstack()
-# final_df.reset_index(inplace = True)
-# final_df.fillna(0,inplace=True)
-# new_df = final_df.iloc[:,1:]
-# new_df.index = final_df['Candidate Name']
-
-
-# In[174]:
-
-
-# new_df
-
-
-# In[175]:
-
-
-# import matplotlib.pyplot as plt
-# plt.rcParams.update({'font.size': 10})
-# ax = new_df.plot.barh(title="Resume keywords by category", legend=False, figsize=(25,7), stacked=True)
-# labels = []
-# for j in new_df.columns:
-#     for i in new_df.index:
-#         label = str(j)+": " + str(new_df.loc[i][j])
-#         labels.append(label)
-# patches = ax.patches
-# for label, rect in zip(labels, patches):
-#     width = rect.get_width()
-#     if width > 0:
-#         x = rect.get_x()
-#         y = rect.get_y()
-#         height = rect.get_height()
-#         ax.text(x + width/2., y + height/2., label, ha='center', va='center')
-# plt.show()
-
