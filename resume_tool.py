@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[635]:
-
 
 import PyPDF2
 import os
@@ -16,8 +14,6 @@ from io import StringIO
 import matplotlib.pyplot as plt
 from spacy.matcher import Matcher
 
-
-# In[648]:
 
 
 mypath = input('Enter folder path: ')
