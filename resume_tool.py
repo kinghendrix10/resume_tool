@@ -15,15 +15,6 @@ import matplotlib.pyplot as plt
 from spacy.matcher import Matcher
 
 
-
-mypath = input('Enter folder path: ')
-assert os.path.exists(mypath), 'Files not found at '+str(mypath)
-# # mypath = open(user_input, 'r+')
-onlyfiles = [os.path.join(mypath, f) for f in os.listdir(mypath) if os.path.isfile(os.path.join(mypath, f))]
-resume_tool(onlyfiles)[0]
-
-
-
 def extract_func(file):
     fileReader = PyPDF2.PdfFileReader(open(file,'rb'))
     countpage = fileReader.getNumPages()
