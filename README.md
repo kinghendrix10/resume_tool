@@ -7,3 +7,11 @@ Skills.csv is where the needed skills can be saved and used to parse CVs or resu
 Dump all the resumes into a single folder and copy the file path then paste it on the 'mypath' variable in the 'init' file and sit back.
 
 Working on making this a web application
+
+
+
+# Code and reference help
+
+https://omkarpathak.in/2018/12/18/writing-your-own-resume-parser/
+
+https://towardsdatascience.com/resume-screening-with-python-1dea360be49b
