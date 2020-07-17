@@ -1,0 +1,14 @@
+Statistics,Machine_Learning,Deep_Learning,R_Language,Python_Language,NLP,Data_Engineering
+statistics,linear regression,neural network,r language,python,nlp,aws
+statistical models,logisitc regression,keras,ggplot,flash,natural langauge processing,ec2
+statistical modelling,k means,theano,shiny,django,topic modelling,amazon redshift
+probability,random forest,face detection,dplyr,pandas,pos tagging,s3
+normal distribution,xgboost,tensorflow,cran,numpy,name entity recognition,docker
+poisson distribution,svm,lstm,knitr,scikitlearn,word2vec,sagemaker
+hypothesis testingx,naïve bayes,open cv,,sklearn,word embedding,
+bayesian inference,pca,gpu,,scipy,spacy,scala
+factor analysis,ensemble models,,,matplotlib,nltk,kubernetes
+forecasting,,computer vision,,statsmodels,ngrams,aws lambda
+,,,,seaborn,bag of words,hive
+,,,,,sentiment anlysis,hadoop
+,,,,,chat bot,sql
