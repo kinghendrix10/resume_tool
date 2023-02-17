@@ -45,7 +45,6 @@ app = Flask(__name__)
 @app.route('/', methods=['GET', 'POST'])
 def resume_folder():
     # return "Hello"
-    # mypath = 'C:/Users/Huleji/Documents/CV and Resume/Sample/' #enter your path here where you saved the resumes
     mypath = input('Enter folder path: ')
     assert os.path.exists(mypath), 'Files not found at '+str(mypath)
     # mypath = open(user_input, 'r+')
