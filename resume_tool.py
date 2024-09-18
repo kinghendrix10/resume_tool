@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-
 import PyPDF2
 import os
 import re
@@ -13,21 +12,30 @@ import pandas as pd
 from io import StringIO
 import matplotlib.pyplot as plt
 from spacy.matcher import Matcher
-
+import docx2txt
+import textract
+from llama_index import GPTSimpleVectorIndex, SimpleDirectoryReader, LLMPredictor, PromptHelper
+from langchain import OpenAI
+import openai
 
 def extract_func(file):
-    fileReader = PyPDF2.PdfFileReader(open(file,'rb'))
-    countpage = fileReader.getNumPages()
-    count = 0
-    resume = []
-    while count < countpage:    
-        pageObj = fileReader.getPage(count)
-        count +=1
-        txt = pageObj.extractText()
-        resume.append(txt)
-    return resume
-
-
+    if file.endswith('.pdf'):
+        fileReader = PyPDF2.PdfFileReader(open(file,'rb'))
+        countpage = fileReader.getNumPages()
+        count = 0
+        resume = []
+        while count < countpage:    
+            pageObj = fileReader.getPage(count)
+            count +=1
+            txt = pageObj.extractText()
+            resume.append(txt)
+        return resume
+    elif file.endswith('.docx'):
+        return [docx2txt.process(file)]
+    elif file.endswith('.doc'):
+        return [textract.process(file).decode('utf-8')]
+    else:
+        return []
 
 def candidate_table(file, cand_df=pd.DataFrame(), cand_profile=pd.DataFrame(), nlp = en_core_web_sm.load()):
     
@@ -202,12 +210,21 @@ def cand_graph(dataframe):
             ax.text(x + width/2., y + height/2., label, ha='center', va='center')
     return plt
 
+def analyze_with_llama(text):
+    openai.api_key = os.getenv("OPENAI_API_KEY")
+    response = openai.Completion.create(
+        engine="text-davinci-003",
+        prompt=text,
+        max_tokens=150
+    )
+    return response.choices[0].text.strip()
 
-def resume_tool(onlyfiles, database = pd.DataFrame(),     database1 = pd.DataFrame()):  
+def resume_tool(onlyfiles, database = pd.DataFrame(), database1 = pd.DataFrame()):  
     i = 0 
     while i < len(onlyfiles):
         file = onlyfiles[i]
         dat, dat1 = candidate_table(file)
         database, database1 = database.append(dat), database1.append(dat1)
         i +=1
-    return database, cand_graph(database1)
+    analysis_results = [analyze_with_llama(text) for text in database['Skills']]
+    return database, cand_graph(database1), analysis_results

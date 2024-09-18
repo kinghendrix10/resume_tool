@@ -8,10 +8,31 @@ Dump all the resumes into a single folder and copy the file path then paste it o
 
 Working on making this a web application
 
+## Dependencies
 
+- Streamlit
+- Llama 3.1 70b models
+- Groq API
+- PyPDF2
+- docx2txt
+- textract
+- spaCy
+- pandas
+- matplotlib
+- openai
 
-# Code and reference help
+## Usage
 
-https://omkarpathak.in/2018/12/18/writing-your-own-resume-parser/
+1. Install the required dependencies:
+   ```bash
+   pip install streamlit PyPDF2 docx2txt textract spacy pandas matplotlib openai
+   ```
 
-https://towardsdatascience.com/resume-screening-with-python-1dea360be49b
+2. Run the Streamlit app:
+   ```bash
+   streamlit run app.py
+   ```
+
+3. Upload PDF, DOC, or DOCX files through the Streamlit web interface.
+
+4. View the analysis results and comparison metrics.
