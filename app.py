@@ -1,59 +1,22 @@
-# import numpy as np
-# from flask import Flask, request, jsonify, render_template
-# # from resume_tool import *
+import streamlit as st
+from resume_tool import resume_tool
+import os
 
-# app = Flask(__name__)
-# # model = pickle.load(open('model.pkl', 'rb'))
+def main():
+    st.title("Resume Analysis Tool")
 
-# @app.route('/')
-# def home():
-#     # resume_tool
+    uploaded_files = st.file_uploader("Choose PDF, DOC, or DOCX files", type=["pdf", "doc", "docx"], accept_multiple_files=True)
 
-#     return render_template('index.html')
+    if uploaded_files:
+        file_paths = []
+        for uploaded_file in uploaded_files:
+            file_path = os.path.join("tempDir", uploaded_file.name)
+            with open(file_path, "wb") as f:
+                f.write(uploaded_file.getbuffer())
+            file_paths.append(file_path)
 
-# @app.route('/predict', methods=['POST'])
-# def resume_module():
-# # #     '''
-# # #     For rendering results on HTML GUI
-# # #     '''
-# #     file_path = request.form.values()
-# # #     final_features = [np.array(int_features)]
-# # #     prediction = model.predict(final_features)
+        result = resume_tool(file_paths)
+        st.write(result[0])
 
-# # #     output = round(prediction[0], 2)
-
-# #     return render_template('index.html', resume_tool)
-
-# # @app.route('/predict_api',methods=['POST'])
-# # def predict_api():
-# #     '''
-# #     For direct API calls trought request
-# #     '''
-# #     data = request.get_json(force=True)
-# #     prediction = model.predict([np.array(list(data.values()))])
-
-# #     output = prediction[0]
-# #     return jsonify(output)
-
-# if __name__ == "__main__":
-#     app.run(debug=True)
-
-from flask import Flask, request
-
-app = Flask(__name__)
-
-@app.route('/', methods=['GET', 'POST'])
-def resume_folder():
-    # return "Hello"
-    mypath = input('Enter folder path: ')
-    assert os.path.exists(mypath), 'Files not found at '+str(mypath)
-    # mypath = open(user_input, 'r+')
-    onlyfiles = [os.path.join(mypath, f) for f in os.listdir(mypath) if os.path.isfile(os.path.join(mypath, f))]
-    return resume_tool(onlyfiles)[0]
-    # if request.method == 'POST':
-    #     f = request.files['the_file']
-    #     f.save('/var/www/uploads/uploaded_file.txt')   
-
-    
 if __name__ == "__main__":
-    app.run(debug=True)
+    main()
