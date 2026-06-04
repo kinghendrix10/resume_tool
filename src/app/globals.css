@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-ibm-plex), ui-sans-serif, system-ui, sans-serif;
+  --color-surface: #f8f9fb;
+  --color-surface-elevated: #ffffff;
+  --color-border: #e2e8f0;
+  --color-primary: #0d9488;
+  --color-primary-foreground: #f0fdfa;
+  --color-accent: #2563eb;
+  --color-muted: #64748b;
+  --color-foreground: #0f172a;
+}
+
+body {
+  @apply bg-[var(--color-surface)] text-[var(--color-foreground)] antialiased;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  body {
+    background: white;
+  }
+}

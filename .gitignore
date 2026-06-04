@@ -1,0 +1,36 @@
+﻿# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Dependencies
+node_modules/
+
+# Next.js
+.next/
+out/
+
+# TypeScript
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# Testing
+playwright-report/
+test-results/
+coverage/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Temp / debug
+_write_probe.txt
+
+# Legacy web/ subfolder (if recreated)
+web/node_modules/
+web/.next/
+web/out/
+web/playwright-report/
+web/test-results/

@@ -1,38 +1,30 @@
-# resume_tool
+# Resume intelligence (Next.js)
 
-Created a tool to parse CV in pdf format and build a table of the candidates profiles and skills as required by the user.
+## Quick start
 
-Skills.csv is where the needed skills can be saved and used to parse CVs or resumes and also represent the skills as a graph
+```bash
+cp .env.example .env
+# set GEMINI_API_KEY
+npm install
+npm run dev
+```
 
-Dump all the resumes into a single folder and copy the file path then paste it on the 'mypath' variable in the 'init' file and sit back.
+## Scripts
 
-Working on making this a web application
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Development server |
+| `npm run build` | Production build |
+| `npm test` | Vitest unit tests |
+| `npm run test:e2e` | Playwright (needs `npx playwright install chromium` once) |
 
-## Dependencies
+API: `POST /api/parse` with `multipart/form-data` field `files` (repeatable).
 
-- Streamlit
-- Llama 3.1 70b models
-- Groq API
-- PyPDF2
-- docx2txt
-- textract
-- spaCy
-- pandas
-- matplotlib
-- openai
+## Source layout
 
-## Usage
-
-1. Install the required dependencies:
-   ```bash
-   pip install streamlit PyPDF2 docx2txt textract spacy pandas matplotlib openai
-   ```
-
-2. Run the Streamlit app:
-   ```bash
-   streamlit run app.py
-   ```
-
-3. Upload PDF, DOC, or DOCX files through the Streamlit web interface.
-
-4. View the analysis results and comparison metrics.
+| Path | Role |
+|------|------|
+| `src/app/` | Next.js App Router pages and `api/` routes |
+| `src/components/resume/` | Dashboard UI (workspace, charts, compare) |
+| `src/lib/resume/` | Zod schema, Gemini parse, PDF/DOCX extract, scoring, normalization, chart data |
+| `src/components/AppErrorBoundary.tsx` | Global client error boundary |
